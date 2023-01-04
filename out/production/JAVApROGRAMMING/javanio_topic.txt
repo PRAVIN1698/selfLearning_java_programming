@@ -1,0 +1,56 @@
+
+    /*
+    In non-blocking I/O, operations are performed asynchronously, which means that they do not block the calling thread. Instead, the thread initiates the operation and then continues to do other work while the operation is in progress.
+
+    In Java, non-blocking I/O is based on the java.nio package, which provides a set of classes and interfaces for performing I/O operations asynchronously. These classes and interfaces include:
+
+    Channel: A channel represents an open connection to an I/O source or destination, such as a file, a socket, or a pipe. Channels are used to read and write data asynchronously, using buffers.
+
+    Buffer: A buffer is a container for data that is being read from or written to a channel. Buffers are used to store data temporarily while it is being transferred between a channel and an application.
+
+    Selector: A selector is a multiplexer that allows an application to monitor a set of channels for events, such as the availability of data to be read or written. Selectors are used to implement non-blocking I/O operations efficiently.
+
+    To perform a non-blocking I/O operation in Java, an application typically follows these steps:
+
+    Open a channel to the I/O source or destination.
+
+    Allocate a buffer to hold the data being read or written.
+
+    Register the channel with a selector, specifying the type of event (e.g., read or write) that the application is interested in.
+
+    Wait for the selector to indicate that the channel is ready for the requested operation.
+
+    When the channel is ready, use the channel and buffer to perform the I/O operation.
+
+    Here is an example of code that uses non-blocking I/O to read data from a channel:
+
+    Copy code
+    Selector selector = Selector.open();
+    SocketChannel channel = SocketChannel.open();
+channel.configureBlocking(false);
+channel.register(selector, SelectionKey.OP_READ);
+
+while (true) {
+        int readyChannels = selector.select();
+        if (readyChannels == 0) continue;
+
+        Set<SelectionKey> selectedKeys = selector.selectedKeys();
+        Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
+        while (keyIterator.hasNext()) {
+            SelectionKey key = keyIterator.next();
+            if (key.isReadable()) {
+                ByteBuffer buffer = ByteBuffer.allocate(1024);
+                int bytesRead = channel.read(buffer);
+                buffer.flip();
+                // process the data in the buffer
+            }
+            keyIterator.remove();
+        }
+    }
+    In this code, the select() method of the selector is used to wait for the channel to be ready for reading. When the channel is ready, the read() method of the channel is called to read data from the channel into a buffer. The data in the buffer can then be processed by the application.
+
+    Non-blocking I/O can be more efficient than standard I/O because it allows the application to perform other tasks while waiting for I/O operations to complete. However, it can also be more complex to use, as it requires the application to manage the state of the I/O operations and to handle the flow of data between channels and buffers.
+
+
+    /*
+
